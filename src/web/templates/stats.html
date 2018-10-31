@@ -1,0 +1,47 @@
+{%- extends "base.html" %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <h1>Stats</h1>
+        </div>
+    </div>
+    <div class="container">
+    <h1>System-wide Stats</h1>
+    <ul>
+        <li>Incoming Emails: {{ system_stats['incoming_emails'] }}</li>
+        <li>Queued Emails: {{ system_stats['queued_emails'] }}</li>
+        <li>Accepted Addresses: {{ system_stats['accepted_addrs'] }}</li>
+        <li>Rejected Addresses: {{ system_stats['rejected_addrs'] }}</li>
+    </ul>
+    </div>
+    <br/>
+    <br/>
+    <div class="container">
+        <h1>Per-Address Stats</h1>
+        <table id="stats" class="table table-striped">
+            <thead>
+                <tr>
+                    <td>Address</td>
+                    <td>Accepted Emails</td>
+                    <td>Blocked Emails</td> <!-- while the address is disabled -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for alias in aliases %}
+                <tr>
+                    <td>
+                        {{ alias.alias }}@{{ alias.domain.name }}
+                    </td>
+                    <td>
+                        {{ alias.num_accepted }}
+                    </td>
+                    <td>
+                        {{ alias.num_rejected }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

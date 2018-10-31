@@ -1,0 +1,110 @@
+{%- extends "base.html" %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <h1>Address Management</h1>
+        </div>
+    </div>
+    <div class="container">
+        <table id="aliases" class="table table-striped">
+            <thead>
+                <tr>
+                    <td>Address</td>
+                    <td>Forward</td>
+                    <td>Comment</td>
+                    <td>Expires</td>
+                    <td>Enabled</td>
+                    <td>Edit</td>
+                    <td>Delete</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for update_form in update_forms %}
+                <tr>
+                    {{ update_form.id }}
+                    <td>
+                        <div class="input-group">
+                            <input type="text" name="alias" required readonly value="{{ update_form.alias.data }}" aria-describedby="domain-{{ update_form.id.data }}" class="form-control">
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="domain-{{ update_form.id.data }}">@{{ update_form.domain.data }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {{ render_field(update_form.forward, form_type='inline', readonly=True) }}
+                    </td>
+                    <td>
+                        {{ render_field(update_form.comment, form_type='inline', readonly=True) }}
+                    </td>
+                    <td>
+                        {{ render_field(update_form.expires, form_type='inline', readonly=True) }}
+                    </td>
+                    <td>
+                        <input type="checkbox" class="form-check" disabled name="enabled" {% if update_form.enabled.data %}checked{% endif %} />
+                    </td>
+                    <td><button type="button" class="btn btn-primary addr-edit">Edit</button></td>
+                    <td><button type="button" class="btn btn-danger addr-delete">Delete</button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <hr/>
+    <div class="container">
+    {{ render_form(create_form) }}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="application/javascript">
+    function createForm(o) {
+        let $tr = $(o).closest('tr');
+
+        let $form = $('<form method="POST"></form>');
+
+        $form.append($tr.find('input[name="id"]'));
+
+        let $hidden_csrf = $('<input type="hidden" name="csrf_token"/>');
+        $hidden_csrf.val(csrf_token);
+        $form.append($hidden_csrf);
+
+        return $form;
+    }
+
+    $(document).ready(function () {
+        $('.addr-edit').click(function() {
+            // Disable other rows
+            $('.addr-edit').prop("disabled", true);
+            $('.addr-delete').prop("disabled", true);
+
+            // Make us an (enabled) save button
+            $(this).prop("disabled", false);
+            $(this).removeClass("addr-edit");
+            $(this).html("Save");
+
+            // Enable the text fields on this row
+            let $tr = $(this).closest('tr');
+            $tr.find('input').prop("readonly", false);
+            $tr.find('input').prop("disabled", false);
+
+
+            // Then when they click save
+            $(this).click(function() {
+                // Create a temp form with the inputs for the row they hit submit on
+                let $form = createForm(this);
+                $form.append($tr.find('input'));
+                $form.append($('<input type="hidden" name="action" value="update"/>'));
+                $form.appendTo('body').submit();
+            });
+        });
+
+        $('.addr-delete').click(function() {
+            let $form = createForm(this);
+            $form.append($('<input type="hidden" name="action" value="delete"/>'));
+            $form.appendTo('body').submit();
+        })
+    });
+    </script>
+{% endblock %}

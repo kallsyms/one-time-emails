@@ -1,0 +1,50 @@
+{% from 'bootstrap/form.html' import render_form, render_field %}
+{% from 'bootstrap/nav.html' import render_nav_item %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>One-time Use Emails</title>
+    {{ bootstrap.load_css() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" type="text/css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <a class="navbar-brand" href="{{ url_for('mail.index') }}">One-time Use Emails</a>
+
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                {{ render_nav_item('mail.index', 'Address Management', use_li=True) }}
+                {{ render_nav_item('mail.stats', 'Statistics', use_li=True) }}
+                {% if current_user.is_authenticated %}
+                {{ render_nav_item('auth.logout', 'Logout', use_li=True) }}
+                {% else %}
+                {{ render_nav_item('auth.login', 'Login', use_li=True) }}
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+    <main role="main">
+        {% block content %}{% endblock %}
+    </main>
+
+    {{ bootstrap.load_js() }}
+
+    <script type="application/javascript">
+        var script_url = "{{ url_for('mail.index') }}";
+        var csrf_token = "{{ csrf_token() }}";
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                }
+            }
+        });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

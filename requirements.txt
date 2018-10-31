@@ -1,0 +1,9 @@
+aiosmtpd
+bootstrap-flask
+dnspython
+flask
+flask-sqlalchemy
+flask-wtf
+flask-login
+pymysql
+python-ldap
