@@ -55,8 +55,7 @@ def _send_mail(from_addr, to_addr, content):
     hosts = [mx.exchange.to_text() for mx in mx_records] + [a.to_text() for a in a_records]
 
     for host in hosts:
-        if send_mail_to_host_port(from_addr, to_addr, content, host, 587) or \
-                send_mail_to_host_port(from_addr, to_addr, content, host, 25):
+        if send_mail_to_host_port(from_addr, to_addr, content, host, 25):
             return True
 
     return False
